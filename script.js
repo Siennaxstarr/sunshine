@@ -1,18 +1,19 @@
-let timeLeft = document.querySelector(".time-left");
-let quizContainer = document.getElementById("container");
-let nextBtn = document.getElementById("next-button");
-let countOfQuestion = document.querySelector(".number-of-questions");
-let displayContainer = document.getElementById("display-container");
-let scoreContainer = document.querySelector(".score-container");
-let restart = document.getElementById("restart");
-let userScore = document.getElementById("user-score");
-let startScreen = document.querySelector(".start-quiz"); 
-let startButton = document.getElementById("start-button");
-let questionCount;
-let scoreCount = 0;
-let count = 11; 
-let countdown;
-
+document.addEventListener("DOMContentLoaded", function() {
+    let timeLeft = document.getElementById("time-left");
+    let quizContainer = document.getElementById("container");
+    let nextBtn = document.getElementById("next-button");
+    let countOfQuestion = document.getElementById("number-of-questions");
+    let displayContainer = document.getElementById("display-container");
+    let scoreContainer = document.querySelector(".score-container");
+    let restart = document.getElementById("restart");
+    let userScore = document.getElementById("user-score");
+    let startScreen = document.querySelector(".start-quiz");
+    let startButton = document.getElementById("start-button");
+    let questionCount;
+    let scoreCount = 0;
+    let count = 11;
+    let countdown;
+});
 
 const quizArray = [
     {
@@ -78,48 +79,39 @@ const quizArray = [
     },
 ]
 
-quizContainer.addEventListener("click", (event) => {
-    const clickedOption = event.target;
-    if (clickedOption.classList.contains("option-div")) {
-        checker(clickedOption);
-    }
-});
-
 restart.addEventListener("click", () => {
     initial();
     displayContainer.classList.remove("hide");
     scoreContainer.classList.add("hide");
 });
 
-nextBtn.addEventListener("click", (displayNext = () =>{
+nextBtn.addEventListener("click", (displayNext = () => {
     questionCount += 1;
 
-    if(questionCount == quizArray.length){
+    if (questionCount == quizArray.length) {
         displayContainer.classList.add("hide");
         scoreContainer.classList.remove("hide");
         userScore.innerHTML = "Your score is " +
-        scoreCount + " out of " + questionCount;
-}
-else{
-    countOfQuestion.innerHTML = questionCount + 1 +
-    " of " + quizArray.length + "Question";
+            scoreCount + " out of " + questionCount;
+    } else {
+        countOfQuestion.innerHTML = 1 + " of " + quizArray.length + " Questions";
 
-    quizDisplay(questionCount);
-    count = 11;
-    clearInterval(countdown);
-    timerDisplay();
-}
-})
-);
+        quizDisplay(questionCount);
+        count = 11;
+        clearInterval(countdown);
+        timerDisplay();
+    }
+}));
+
 
 const timerDisplay = () => {
-    countdown = setInterval(() => {
-        count--;
-        timeLeft.innerHTML = `${count}s`;
-        if (count === 0) {
-            clearInterval(countdown);
-            displayNext();
-        }
+countdown = setInterval(() => {
+count--;
+timeLeft.innerHTML = `${count}s`;
+if (count === 0) {
+clearInterval(countdown);
+displayNext();
+}
     }, 1000);
 };
 
@@ -135,34 +127,58 @@ const quizDisplay = (questionCount) =>{
 function quizCreator() {
     quizArray.sort(() => Math.random() - 0.5);
 
-    for (let i of quizArray) {
-        i.options.sort(() => Math.random() - 0.5);
+    for(let i of quizArray){
+        i.options.sort(()=> Math.random() - 0.5);
         let div = document.createElement("div");
         div.classList.add("container-mid", "hide");
 
-        countOfQuestion.innerHTML = 1 + " of " + quizArray.length + " Questions";
+        countOfQuestion.innerHTML = "1 of " + quizArray.length + " Questions";
+
 
         let question_DIV = document.createElement("p");
         question_DIV.classList.add("question");
         question_DIV.innerHTML = i.questions;
         div.appendChild(question_DIV);
-
+        
         div.innerHTML += `
         <button class="option-div" onclick="checker(this)">${i.options[0]}</button>
         <button class="option-div" onclick="checker(this)">${i.options[1]}</button>
         <button class="option-div" onclick="checker(this)">${i.options[2]}</button>
         <button class="option-div" onclick="checker(this)">${i.options[3]}</button>
     `;
-        quizContainer.appendChild(div);
-    }
+         quizContainer.appendChild(div);
+    }   
 }
 
-// ...
+
+function checker(userOption) {
+    let userSolution = userOption.innerText;
+    let question = document.getElementsByClassName("container-mid")[questionCount];
+    let options = question.querySelectorAll(".option-div");
+
+    if (userSolution === quizArray[questionCount].correct) {
+        userOption.classList.add("correct");
+        scoreCount++;
+    } else {
+        userOption.classList.add("incorrect");
+
+        options.forEach((element) => {
+            if (element.innerText === quizArray[questionCount].correct) {
+                element.classList.add("correct");
+            }
+        });
+    }
+
+    clearInterval(countdown);
+    options.forEach((element) => {
+        element.disabled = true;
+    });
+}
 
 function initial() {
-    quizContainer.innerHTML = "";
+    quizContainer.innerHTML = " ";
     questionCount = 0;
-    scoreCount = 0; // Remove one of these scoreCount assignments
+    scoreCount = 0;
     count = 11;
     clearInterval(countdown);
     timerDisplay();
@@ -170,26 +186,15 @@ function initial() {
     quizDisplay(questionCount);
 }
 
-function checker(selectedOption) {
-    const selectedAnswer = selectedOption.textContent;
+quizCreator();
+startScreen.classList.add("hide");
+displayContainer.classList.remove("hide");
 
-    const currentQuestion = quizArray[questionCount];
-
-    if (selectedAnswer === currentQuestion.correct) {
-        scoreCount += 1;
-    }
-
-    displayNext();
-}
-
-startButton.addEventListener("click", () => {
-    startScreen.classList.add("hide");
-    displayContainer.classList.remove("hide");
-    initial();
-});
 
 window.onload = () => {
-    startScreen.classList.remove("hide");
-    displayContainer.classList.add("hide");
-}
-
+    startButton.addEventListener("click", () => {
+        startScreen.classList.add("hide");
+        displayContainer.classList.remove("hide");
+        initial();
+    });
+};
